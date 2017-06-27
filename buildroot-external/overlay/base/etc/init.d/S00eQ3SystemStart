@@ -93,7 +93,9 @@ checkFactoryReset() {
         umount -f /usr/local
 
         # we create a clean ext4 userfs partition
-        mkfs.ext4 -F "${ROOTPARTDEV%?}4" -L userfs
+        mkfs.ext4 -F -L userfs "${ROOTPARTDEV%?}4"
+        tune2fs -c 0 -i 0 "${ROOTPARTDEV%?}4"
+        e2fsck -pDf "${ROOTPARTDEV%?}4"
 
         # mount /usr/local again
         mount /usr/local
@@ -116,8 +118,12 @@ checkFactoryReset() {
       # create partition 3 with the same size like partition 2
       parted -s ${DEV} mkpart primary "$((END_B+1))B" "$((END_B+1 + SIZE_B))B"
 
-      # we create a clean ext4 rootfs2 partition
-      mkfs.ext4 -F "${ROOTPARTDEV%?}3" -L rootfs2
+      # we create a clean ext4 rootfs2 partition with same filesystem features
+      NUM_INODES=$(tune2fs -l ${ROOTPARTDEV}  | grep "Inode count:" | awk '{ print $3 }')
+      FS_FEATURE=$(tune2fs -l ${ROOTPARTDEV}  | grep "Filesystem features:" | awk '{ print substr($0, index($0,$3)) }' | tr ' ' ',')
+      mkfs.ext2 -F -L rootfs2 -N ${NUM_INODES} "${ROOTPARTDEV%?}3"
+      tune2fs -j -J size=1 -c 0 -i 0 -o ^acl,^user_xattr -O ${FS_FEATURE} "${ROOTPARTDEV%?}3"
+      e2fsck -pDf "${ROOTPARTDEV%?}3"
     fi
 
     ###############
@@ -131,7 +137,9 @@ checkFactoryReset() {
       parted -s ${DEV} mkpart primary "$((END_B+1))B" "$((MAX_B-1))B"
 
       # we create a clean ext4 userfs partition
-      mkfs.ext4 -F "${ROOTPARTDEV%?}4" -L userfs
+      mkfs.ext4 -F -L userfs "${ROOTPARTDEV%?}4"
+      tune2fs -c 0 -i 0 "${ROOTPARTDEV%?}4"
+      e2fsck -pDf "${ROOTPARTDEV%?}4"
 
       # mount /usr/local again
       mount /usr/local
