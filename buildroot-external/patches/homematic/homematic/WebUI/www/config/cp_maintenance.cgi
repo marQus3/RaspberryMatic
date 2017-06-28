@@ -259,8 +259,8 @@ proc action_firmware_update_go {} {
 
 proc action_firmware_update_cancel {} {
   global env
-  catch {exec rm /var/new_firmware.tar.gz}
-  catch { exec /bin/sh -c "rm /var/EULA.*"}
+  catch {exec /bin/sh -c "rm -f /usr/local/tmp/*-*.img*"}
+  #catch {exec /bin/sh -c "rm /var/EULA.*"}
   cgi_javascript {
     puts "var url = \"$env(SCRIPT_NAME)?sid=\" + SessionId;"
     puts {
