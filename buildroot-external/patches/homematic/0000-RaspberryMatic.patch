@@ -746,6 +746,15 @@
  
 --- homematic/WebUI/www/config/cp_maintenance.cgi.orig
 +++ homematic/WebUI/www/config/cp_maintenance.cgi
+@@ -221,7 +221,7 @@
+ 
+ proc action_firmware_update_go {} {
+     global env
+-    cd /tmp/
++    cd /usr/local/tmp/
+     
+     http_head
+ 
 @@ -377,7 +377,7 @@
                                          table_row {
                                              table_data {
@@ -759,7 +768,7 @@
                      }
                  }
                  table_data {align="left"} {class="CLASS20921"} {
-+                    puts "\${dialogSettingsCMHintSoftwareUpdateRaspMatic}"
++                    puts "\${dialogSettingsCMHintSoftwareUpdateRaspMatic}<br/>"
                      puts "\${dialogSettingsCMHintSoftwareUpdate1}"
                      number_list {class="j_noForcedUpdate"} {
                          li {
@@ -790,8 +799,7 @@
  
              # Version Logikschicht
 -            table_row {class="CLASS20902 j_noForcedUpdate j_fwUpdateOnly"} {
-+            #table_row {class="CLASS20902 j_noForcedUpdate j_fwUpdateOnly"} {
- 
+-
 -              table_data {class="CLASS20903"} $styleMaxWidth {
 -                puts "\${lblTDRegaVersion}"
 -              }
@@ -824,7 +832,8 @@
 -                  }
 -                }
 -              }
--
++            #table_row {class="CLASS20902 j_noForcedUpdate j_fwUpdateOnly"} {
+ 
 -              table_data {align="left"} {class="CLASS20904"} {
 -                puts "\${lblTDReGaVersionHelp}"
 -              }
@@ -948,6 +957,45 @@
              OnEnterSafeMode = function() {
                new YesNoDialog(translateKey("dialogSafetyCheck"), translateKey("dialogQuestionRestartSafeMode"), function(result) {
                  if (result == YesNoDialog.RESULT_YES)
+@@ -818,25 +840,25 @@
+ 
+ proc action_firmware_upload {} {
+     global env sid downloadOnly
+-    cd /tmp/
++    cd /usr/local/tmp/
+     
+     http_head
+     import_file -client firmware_file
+ 
+     # check if the uploaded file looks like a firmware file
+-    set file_valid 0
+-    catch {
+-        #set file_valid [expr [string first "update_script" [exec tar tzf [lindex $firmware_file 0]]] >= 0 ]
+-        exec tar zxvf [lindex $firmware_file 0] update_script EULA.en EULA.de EULA.tr -C /var/
+-    }
+-    set file_valid [file exists "/var/update_script"]
+-
+-    if {$file_valid} {
+-      file rename -force -- [lindex $firmware_file 0] "/var/new_firmware.tar.gz"
+-      #set action "firmware_update_confirm"
+-      set action "acceptEula"
++    set invalid_file [catch {exec unzip -q -o -d /usr/local/tmp [lindex $firmware_file 0]} result]
++    if {$invalid_file == 0} {
++      set invalid_file [catch {file exists [glob /usr/local/tmp/*-*\.img]} result]
++      if {$invalid_file == 0} {
++        set invalid_file [catch {exec sha256sum -c [glob /usr/local/tmp/*-*\.img\.sha256]} result]
++      }
++    }
++    file delete -force -- [lindex $firmware_file 0]
++
++    if {$invalid_file == 0} {
++        set action "firmware_update_confirm"
++        #set action "acceptEula"
+     } else {
+-        file delete -force -- [lindex $firmware_file 0]
+         set action "firmware_update_invalid"
+     }
+     cgi_javascript {
 @@ -934,6 +956,89 @@
      }
  }

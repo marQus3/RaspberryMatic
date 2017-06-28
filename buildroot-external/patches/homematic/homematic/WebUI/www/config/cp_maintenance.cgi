@@ -221,7 +221,7 @@ proc action_firmware_update_invalid {} {
 
 proc action_firmware_update_go {} {
     global env
-    cd /tmp/
+    cd /usr/local/tmp/
     
     http_head
 
@@ -840,25 +840,25 @@ proc get_serial { } {
 
 proc action_firmware_upload {} {
     global env sid downloadOnly
-    cd /tmp/
+    cd /usr/local/tmp/
     
     http_head
     import_file -client firmware_file
 
     # check if the uploaded file looks like a firmware file
-    set file_valid 0
-    catch {
-        #set file_valid [expr [string first "update_script" [exec tar tzf [lindex $firmware_file 0]]] >= 0 ]
-        exec tar zxvf [lindex $firmware_file 0] update_script EULA.en EULA.de EULA.tr -C /var/
+    set invalid_file [catch {exec unzip -q -o -d /usr/local/tmp [lindex $firmware_file 0]} result]
+    if {$invalid_file == 0} {
+      set invalid_file [catch {file exists [glob /usr/local/tmp/*-*\.img]} result]
+      if {$invalid_file == 0} {
+        set invalid_file [catch {exec sha256sum -c [glob /usr/local/tmp/*-*\.img\.sha256]} result]
+      }
     }
-    set file_valid [file exists "/var/update_script"]
+    file delete -force -- [lindex $firmware_file 0]
 
-    if {$file_valid} {
-      file rename -force -- [lindex $firmware_file 0] "/var/new_firmware.tar.gz"
-      #set action "firmware_update_confirm"
-      set action "acceptEula"
+    if {$invalid_file == 0} {
+        set action "firmware_update_confirm"
+        #set action "acceptEula"
     } else {
-        file delete -force -- [lindex $firmware_file 0]
         set action "firmware_update_invalid"
     }
     cgi_javascript {
