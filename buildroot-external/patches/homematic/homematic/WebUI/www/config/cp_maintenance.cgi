@@ -429,7 +429,7 @@ proc action_put_page {} {
                     }
                 }
                 table_data {align="left"} {class="CLASS20921"} {
-                    puts "\${dialogSettingsCMHintSoftwareUpdateRaspMatic}"
+                    puts "\${dialogSettingsCMHintSoftwareUpdateRaspMatic}<br/>"
                     puts "\${dialogSettingsCMHintSoftwareUpdate1}"
                     number_list {class="j_noForcedUpdate"} {
                         li {
