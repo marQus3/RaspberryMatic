@@ -12,16 +12,16 @@
 The RaspberryMatic project is a collaborate effort to provide a lightweight, [Linux/buildroot](http://buildroot.org/)-based HomeMatic compatible distribution for embedded devices like the [RaspberryPi](https://www.raspberrypi.org/). It is based on the **O**pen-**C**entral-**C**ontrol-**U**nit-SDK ([OCCU](https://github.com/eq-3/occu)) provided by [eQ-3](http://eq-3.de) as part of the [HomeMatic](http://homematic.com/) home automation platform. The RaspberryMatic distribution is provided as a full microSD card image that can be directly flashed and then used in a RaspberryPi as the main operating system for controlling all kind of HomeMatic compatible devices with full compatibility to a CCU2 device directly sold by eQ-3.
 
 ## Features
-* 100% HomeMatic CCU system compliant using latest [OCCU 2.27.8](https://github.com/eq-3/occu) software releases
+* 100% HomeMatic CCU system compliant using latest [OCCU 2.29.18](https://github.com/eq-3/occu) software releases
 * Fully BidCos-RF (HomeMatic), Wired (HomeMatic-Wired) and HmIP-RF (HomeMatic-IP) compatible
 * Integration of latest [beta versions of WebUI](https://github.com/eq-3/occu/tree/master/arm-gnueabihf/packages-eQ-3/WebUI-Beta) (`ReGaHss`)
 * Self-contained disk image primarily targeted for RaspberryPi hardware
-* Based on latest [Buildroot 2017.05](http://buildroot.org/) Linux environment
-* Latest [Linux kernel v4.9.x](https://github.com/raspberrypi/linux/tree/rpi-4.9.y) with hard-float support 
+* Based on latest [Buildroot 2017.05.2](http://buildroot.org/) Linux environment
+* Latest [Linux kernel v4.9.40](https://github.com/raspberrypi/linux/tree/rpi-4.9.y) with hard-float support
 * Enabled Preemptive kernel support (`PREEMPT`) to minimize latencies and improve CCU operation properties
 * Support to boot system using an external USB memory stick or hard disk (RaspberryPi3 only)
 * Read-only root file system to minimize write operations on SD card
-* Supports latest JAVA8 runtime environment ([1.8.0_121-8.20.0.42](http://www.azul.com/downloads/zulu-embedded/))
+* Supports latest JAVA8 runtime environment ([1.8.0_131-8.21.0.57](http://www.azul.com/downloads/zulu-embedded/))
 * Supports onboard WiFi of RaspberryPi3 or Raspberry Pi Zero W as well as various third-party USB WiFi sticks
 * Supports onboard Bluetooth of RaspberryPi3 or Raspberry Pi Zero W as well as various third-party USB Bluetooth sticks
 * Supports [Network UPS Tools](http://networkupstools.org) (NUT) setup including USB connection of UPS as well as NUT server use (e.g. via Synology NAS Network UPS functionality)
@@ -39,6 +39,7 @@ The RaspberryMatic project is a collaborate effort to provide a lightweight, [Li
 
 ## Limitations
 * No web-based configuration for setting up WiFi or Bluetooth support (work in progress)
+* A used [HM-Sys-sRP-Pl](https://www.elv.de/controller.aspx?cid=683&detail=10&detail2=731493) repeater cannot be reconfigured
 
 ## Requirements
 * Any of the following [RaspberryPi](https://www.raspberrypi.org/products/) models:
@@ -62,7 +63,7 @@ The CCU platform allows to enhance the functionality of a CCU by installing so-c
 * [hm_pdetect](https://github.com/jens-maus/hm_pdetect)
 * [Email-Addon](https://github.com/jens-maus/hm_email)
 * [CUxD-Highcharts](https://github.com/hobbyquaker/CUxD-Highcharts)
-* [HQ-WebUI](https://github.com/jens-maus/hq-webui)
+* [HQ-WebUI](https://github.com/hobbyquaker/hq-webui)
 * [DB-Access](https://github.com/jens-maus/dbaccess)
 * [QuickAccess](https://github.com/jens-maus/quickaccess)
 * [Script-Parser](https://github.com/litti/scriptparser)

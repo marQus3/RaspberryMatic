@@ -35,7 +35,7 @@ start() {
 	init
 	start-stop-daemon -b -S -q -m -p $PIDFILE --exec java -- -Xmx128m -Dos.arch=arm -Dlog4j.configuration=file:///etc/config/log4j.xml -Dfile.encoding=ISO-8859-1 -jar ${HM_SERVER} ${HM_SERVER_ARGS}
 	echo -n "."
-	eq3configcmd wait-for-file -f $STARTWAITFILE -p 5 -t 135
+	eq3configcmd wait-for-file -f $STARTWAITFILE -p 5 -t 300
 	echo "OK"
 }
 stop() {
