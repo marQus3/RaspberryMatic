@@ -534,6 +534,26 @@
  #####################
 --- homematic/WebUI/www/config/cp_maintenance.cgi.orig
 +++ homematic/WebUI/www/config/cp_maintenance.cgi
+@@ -221,7 +221,7 @@
+ 
+ proc action_firmware_update_go {} {
+     global env
+-    cd /tmp/
++    cd /usr/local/tmp/
+     
+     http_head
+ 
+@@ -259,8 +259,8 @@
+ 
+ proc action_firmware_update_cancel {} {
+   global env
+-  catch {exec rm /var/new_firmware.tar.gz}
+-  catch { exec /bin/sh -c "rm /var/EULA.*"}
++  catch {exec /bin/sh -c "rm -f /usr/local/tmp/*-*.img*"}
++  #catch {exec /bin/sh -c "rm /var/EULA.*"}
+   cgi_javascript {
+     puts "var url = \"$env(SCRIPT_NAME)?sid=\" + SessionId;"
+     puts {
 @@ -377,7 +377,7 @@
                                          table_row {
                                              table_data {
@@ -569,6 +589,45 @@
                  }
              }
              table_row {class="CLASS20902 j_noForcedUpdate j_fwUpdateOnly"} {
+@@ -823,25 +806,25 @@
+ 
+ proc action_firmware_upload {} {
+     global env sid downloadOnly
+-    cd /tmp/
++    cd /usr/local/tmp/
+     
+     http_head
+     import_file -client firmware_file
+ 
+     # check if the uploaded file looks like a firmware file
+-    set file_valid 0
+-    catch {
+-        #set file_valid [expr [string first "update_script" [exec tar tzf [lindex $firmware_file 0]]] >= 0 ]
+-        exec tar zxvf [lindex $firmware_file 0] update_script EULA.en EULA.de EULA.tr -C /var/
+-    }
+-    set file_valid [file exists "/var/update_script"]
+-
+-    if {$file_valid} {
+-      file rename -force -- [lindex $firmware_file 0] "/var/new_firmware.tar.gz"
+-      #set action "firmware_update_confirm"
+-      set action "acceptEula"
++    set invalid_file [catch {exec unzip -q -o -d /usr/local/tmp [lindex $firmware_file 0]} result]
++    if {$invalid_file == 0} {
++      set invalid_file [catch {file exists [glob /usr/local/tmp/*-*\.img]} result]
++      if {$invalid_file == 0} {
++        set invalid_file [catch {exec sha256sum -c [glob /usr/local/tmp/*-*\.img\.sha256]} result]
++      }
++    }
++    file delete -force -- [lindex $firmware_file 0]
++
++    if {$invalid_file == 0} {
++        set action "firmware_update_confirm"
++        #set action "acceptEula"
+     } else {
+-        file delete -force -- [lindex $firmware_file 0]
+         set action "firmware_update_invalid"
+     }
+     cgi_javascript {
 @@ -957,6 +940,7 @@
      catch { exec lcdtool {Saving     Data...    } }
      rega system.Save()
