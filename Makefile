@@ -2,7 +2,7 @@ BOARD=rpi3
 # BOARD=rpi0
 # BOARD=tinkerboard
 # BOARD=docker
-BUILDROOT_VERSION=2017.08
+BUILDROOT_VERSION=2017.11.1
 VERSION=$(shell cat ./VERSION)
 
 .PHONY: all
@@ -17,7 +17,9 @@ usage:
 	@echo "	make distclean: clean everything"
 
 buildroot-$(BUILDROOT_VERSION).tar.bz2:
-	wget http://git.buildroot.net/buildroot/snapshot/buildroot-$(BUILDROOT_VERSION).tar.bz2
+	wget https://buildroot.org/downloads/buildroot-$(BUILDROOT_VERSION).tar.bz2
+	wget https://buildroot.org/downloads/buildroot-$(BUILDROOT_VERSION).tar.bz2.sign
+	cat buildroot-$(BUILDROOT_VERSION).tar.bz2.sign | grep SHA1: | sed 's/^SHA1: //' | shasum -c
 
 BUILDROOT_PATCHES=$(wildcard buildroot-patches/*.patch)
 
@@ -60,7 +62,7 @@ umount:
 	sudo kpartx -dv build-raspmatic_$(BOARD)/images/sdcard.img
 
 install:
-	sudo dd if=build-raspmatic_$(BOARD)/images/sdcard.img of=$(of) bs=8K conv=sync status=progress
+	sudo dd if=build-raspmatic_$(BOARD)/images/sdcard.img of=$(of) bs=1M conv=fsync status=progress
 
 menuconfig: buildroot-$(BUILDROOT_VERSION) build-raspmatic_$(BOARD)
 	cd build-raspmatic_$(BOARD) && make O=$(shell pwd)/build-raspmatic_$(BOARD) -C ../buildroot-$(BUILDROOT_VERSION) BR2_EXTERNAL=../buildroot-external menuconfig

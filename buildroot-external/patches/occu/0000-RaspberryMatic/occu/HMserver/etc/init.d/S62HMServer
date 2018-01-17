@@ -26,6 +26,11 @@ init() {
 	if [ ! -e /etc/config/log4j.xml ] ; then
 		cp $CFG_TEMPLATE_DIR/log4j.xml /etc/config
 	fi
+	if [ ! -e /etc/config/hmip_networkkey.conf ] ; then
+		if [[ -f $CFG_TEMPLATE_DIR/hmip_networkkey.conf ]]; then
+			cp $CFG_TEMPLATE_DIR/hmip_networkkey.conf /etc/config
+		fi
+	fi
 
 	if [[ -n "${HMIP_DEV}" ]]; then
 		if [[ ! -e /var/etc/crRFD.conf ]]; then
@@ -34,7 +39,7 @@ init() {
 
 		# In HmIP-RFUSB mode we have to change crRFD.conf
 		if [[ "${HMIP_DEV}" == "HMIP-RFUSB" ]]; then
-		  sed -i 's/^Adapter\.1\.Port=\/dev\/.*$/Adapter.1.Port=\/dev\/ttyUSB0/' /var/etc/crRFD.conf
+		  sed -i "s|^Adapter\.1\.Port=/dev/.*$|Adapter.1.Port=${HMIP_DEVNODE}|" /var/etc/crRFD.conf
 		fi
 
 		HM_SERVER=/opt/HMServer/HMIPServer.jar
