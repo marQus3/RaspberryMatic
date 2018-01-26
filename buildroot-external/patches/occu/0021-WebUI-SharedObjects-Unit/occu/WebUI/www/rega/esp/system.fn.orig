@@ -1410,9 +1410,6 @@ function ::getSysVarValAsString()
   if ( bString )
   {
     sSysVarVal = cObjTmp.Value();
-    sSysVarVal = sSysVarVal.Replace("\r\n", "<br/>");
-    sSysVarVal = sSysVarVal.Replace("\r", "<br/>");
-    sSysVarVal = sSysVarVal.Replace("\n", "<br/>");
   }
 }
 
